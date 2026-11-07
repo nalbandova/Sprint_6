@@ -1,7 +1,7 @@
 import allure
 import pytest
 
-from tests.data import FAQ_ANSWERS
+from data import FAQ_ANSWERS
 
 
 @allure.feature("Вопросы о важном")

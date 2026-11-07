@@ -1,23 +1,20 @@
 import allure
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
-from pages.main_page import MainPage
+from urls import BASE_URL, DZEN_URL_PART
 
 
 @allure.feature("Логотипы")
 class TestLogos:
     @allure.title("Логотип Самоката ведёт на главную страницу")
-    def test_scooter_logo(self, main_page, driver):
-        main_page.click_order(MainPage.ORDER_BUTTON_TOP)
-        main_page.click(MainPage.LOGO_SCOOTER)
+    def test_scooter_logo(self, main_page):
+        main_page.click_order("top")
+        main_page.click_scooter_logo()
         assert main_page.is_home_page()
-        assert driver.current_url.rstrip("/") == MainPage.URL.rstrip("/")
+        assert main_page.get_current_url().rstrip("/") == BASE_URL.rstrip("/")
 
     @allure.title("Логотип Яндекса открывает Дзен в новом окне")
-    def test_yandex_logo(self, main_page, driver):
+    def test_yandex_logo(self, main_page):
         main_page.click_yandex_logo()
-        WebDriverWait(driver, 10).until(lambda d: len(d.window_handles) > 1)
-        driver.switch_to.window(driver.window_handles[-1])
-        WebDriverWait(driver, 15).until(EC.url_contains("dzen.ru"))
-        assert "dzen.ru" in driver.current_url
+        main_page.switch_to_new_window()
+        assert main_page.wait_url_contains(DZEN_URL_PART)
+    

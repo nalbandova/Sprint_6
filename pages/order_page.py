@@ -1,6 +1,5 @@
 import allure
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 from pages.base_page import BasePage
 
@@ -20,35 +19,27 @@ class OrderPage(BasePage):
     CONFIRM_BUTTON = (By.XPATH, "//button[text()='Да']")
     SUCCESS_MODAL = (By.XPATH, "//div[contains(@class,'Order_ModalHeader')][contains(text(),'Заказ оформлен')]")
 
-    @staticmethod
-    def metro_option(station):
-        return (By.XPATH, f"//div[contains(@class,'Order_Text')][text()='{station}']")
+    METRO_OPTION = (By.XPATH, "//div[contains(@class,'Order_Text')][text()='{}']")
+    RENTAL_OPTION = (By.XPATH, "//div[contains(@class,'Dropdown-option')][text()='{}']")
+    COLOR_CHECKBOX = (By.ID, "{}")
 
-    @staticmethod
-    def rental_option(period):
-        return (By.XPATH, f"//div[contains(@class,'Dropdown-option')][text()='{period}']")
-
-    @staticmethod
-    def color_checkbox(color):
-        return (By.ID, color)
-
-    @allure.step("Заполнить первую часть формы")
+    @allure.step("Заполнить первую часть формы заказа")
     def fill_first_step(self, data):
         self.type_text(self.NAME, data["name"])
         self.type_text(self.SURNAME, data["surname"])
         self.type_text(self.ADDRESS, data["address"])
         self.click(self.METRO)
-        self.click(self.metro_option(data["metro"]))
+        self.click(self.format_locator(self.METRO_OPTION, data["metro"]))
         self.type_text(self.PHONE, data["phone"])
         self.click(self.NEXT_BUTTON)
 
-    @allure.step("Заполнить вторую часть формы")
+    @allure.step("Заполнить вторую часть формы заказа")
     def fill_second_step(self, data):
         self.type_text(self.DATE, data["date"])
-        self.wait_visible(self.DATE).send_keys(Keys.ENTER)
+        self.press_enter(self.DATE)
         self.click(self.RENTAL_DROPDOWN)
-        self.click(self.rental_option(data["period"]))
-        self.click(self.color_checkbox(data["color"]))
+        self.click(self.format_locator(self.RENTAL_OPTION, data["period"]))
+        self.click(self.format_locator(self.COLOR_CHECKBOX, data["color"]))
         self.type_text(self.COMMENT, data["comment"])
 
     @allure.step("Оформить заказ")
@@ -56,5 +47,7 @@ class OrderPage(BasePage):
         self.click(self.ORDER_BUTTON)
         self.click(self.CONFIRM_BUTTON)
 
+    @allure.step("Проверить, что появилось окно об успешном заказе")
     def is_success_shown(self):
         return self.is_visible(self.SUCCESS_MODAL)
+    
